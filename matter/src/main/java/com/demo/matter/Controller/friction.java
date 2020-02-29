@@ -1,16 +1,13 @@
-package com.demo.matter.controller;
+package com.demo.matter.Controller;
 
-import com.demo.matter.util.Point;
-import com.demo.matter.util.recognizeUtil;
-import org.springframework.stereotype.Controller;
+import com.demo.matter.Util.recognizeUtil;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 
-@Controller
+@RestController
 public class friction {
 
     @RequestMapping("/friction")
@@ -18,7 +15,6 @@ public class friction {
         return "friction";
     }
 
-    @ResponseBody
     @RequestMapping(value = "/friction/handle",method = RequestMethod.POST)
     public Map<String,Object> function(String[] xPoint, String[] yPoint){
         Map<String,Object> model = new HashMap<>();
@@ -26,6 +22,7 @@ public class friction {
             model.put("success",false);
             return model;
         }
+        //TODO
         Object[] rst = recognizeUtil.recognize(xPoint, yPoint);
         if(rst[2] !=null && rst[2] != ""){
             model.put("startX",rst[0]);
