@@ -1,6 +1,10 @@
 package com.demo.matter.Recognize;
 
+import com.demo.matter.Exception.DrawStatusException;
+import com.demo.matter.Geo.gPoint;
 import com.demo.matter.Util.DrawStatus;
+
+import java.util.List;
 
 public class RecognizeCommon {
 
@@ -11,17 +15,27 @@ public class RecognizeCommon {
     }
 
     public static DrawStatus modifyCurrentDrawStatus(String status) {
-        drawStatus = DrawStatus.modifyStatus(status);
-        return drawStatus;
+        switch (status) {
+            case "shape":
+                drawStatus = DrawStatus.SHAPE;
+                return drawStatus;
+
+            case "character":
+                drawStatus = DrawStatus.CHARACTER;
+                return drawStatus;
+
+            default:
+                throw new DrawStatusException();
+        }
     }
 
-    public static void recognize(int[][] pointMatrix) {
+    public static void recognize(List<gPoint> pointList) {
         switch (drawStatus) {
             case SHAPE:
-                RecognizeShape.recognize(pointMatrix);
+                RecognizeShape.recognize(pointList);
                 break;
             case CHARACTER:
-                RecognizeCharacter.recognize(pointMatrix);
+                RecognizeCharacter.recognize(pointList);
                 break;
         }
     }
