@@ -1,17 +1,10 @@
-window.onload=function () {
-    // 初始化对象
-    let myChart=echarts.init(document.getElementById("main"));
+//以下代码用于处理表格
 
 
-    var date = [];
-    var data=[];
-    var i=1;
-// for (var i = 1; i < 20000; i++) {
-//     date.push(i);
-//     data.push(Math.random());
-// }
-
-    option = {
+// 初始化对象，获取表格对象，获取表格选项对象
+function  initTable(){
+    let myChart=echarts.init(document.getElementById("table"));
+    let option = {
         tooltip: {
             trigger: 'axis',
             position: function (pt) {
@@ -20,7 +13,7 @@ window.onload=function () {
         },
         title: {
             left: 'center',
-            text: '大数据量面积图',
+            text: '速度-时间图像',
         },
         toolbox: {
             feature: {
@@ -34,11 +27,14 @@ window.onload=function () {
         xAxis: {
             type: 'category',
             boundaryGap: false,
-            data: date
+            data: [],
+            nameLocation: 'end',
+            name: '时间-秒',
         },
         yAxis: {
             type: 'value',
-            boundaryGap: [0, '100%']
+            boundaryGap: ['0%', '10%'],
+            name: '速度-米/秒'
         },
         dataZoom: [{
             type: 'inside',
@@ -59,27 +55,42 @@ window.onload=function () {
         }],
         series: [
             {
-                name: '模拟数据',
+                name: '',
                 type: 'line',
                 symbol: 'none',
                 sampling: 'average',
-                itemStyle: {
-                    color: 'rgb(255, 70, 131)'
-                },
-                data: data
+                data: [],
             }
         ]
     };
-
-    timeOut1=setInterval(function () {
-        date.push(i++);
-        data.push(Math.random());
-        myChart.setOption(option);
-        if (i>100) {window.clearTimeout(timeOut1);}
-    }, 100);
-
     window.onresize=function () {
         myChart.resize();
     }
-
+    return {myChart,option};
 }
+
+function startDrawTable(drawBodies,time,myChart,option){
+
+    let timeOut1 = setInterval(function () {
+        option.xAxis.data.push(((time++)*0.01).toFixed(2));
+        // console.log(drawBodies);
+        count=drawBodies.length;
+        // console.log(count);
+        for (let i=1;i<=count;i++){
+            if (option.series[i-1]==null){
+                option.series[i-1]={
+                    name: '',
+                    type: 'line',
+                    symbol: 'none',
+                    sampling: 'average',
+                    data: [],
+                }
+            }
+            option.series[i-1].data.push(drawBodies[i-1].speed);
+        }
+        myChart.setOption(option);
+    }, 10);
+    return timeOut1;
+}
+
+
