@@ -3,6 +3,7 @@ package com.demo.matter.Recognize;
 import com.demo.matter.Exception.DrawStatusException;
 import com.demo.matter.Geo.gPoint;
 import com.demo.matter.Util.DrawStatus;
+import com.demo.matter.Util.RecognizeUtil;
 
 import java.util.List;
 
@@ -14,29 +15,46 @@ public class RecognizeCommon {
         return drawStatus;
     }
 
+
+    public static Object[] recognize(List<gPoint> pointList) {
+        if(RecognizeDel.recognize(pointList) != '0'){
+            //TODO 删除手势
+            return null;
+        }
+
+        //状态切换
+        String StatusChange = RecognizeStatusChange.recognize(pointList);
+        if(StatusChange != null){
+            drawStatus = modifyCurrentDrawStatus(StatusChange);
+            return null;
+        }
+
+        Object[] resultType = null;
+        switch (drawStatus) {
+            case SHAPE:
+                //TODO 图形识别
+                //resultType = RecognizeShape.recognize(pointList);
+                resultType = RecognizeUtil.recognize(pointList);
+                break;
+            case CHARACTER:
+                //TODO 字符识别
+                //resultType = RecognizeCharacter.recognize(pointList);
+                break;
+            default:
+                throw new RuntimeException();
+
+        }
+        return resultType;
+    }
+
     public static DrawStatus modifyCurrentDrawStatus(String status) {
         switch (status) {
             case "shape":
-                drawStatus = DrawStatus.SHAPE;
-                return drawStatus;
-
+                return DrawStatus.SHAPE;
             case "character":
-                drawStatus = DrawStatus.CHARACTER;
-                return drawStatus;
-
+                return DrawStatus.CHARACTER;
             default:
                 throw new DrawStatusException();
-        }
-    }
-
-    public static void recognize(List<gPoint> pointList) {
-        switch (drawStatus) {
-            case SHAPE:
-                RecognizeShape.recognize(pointList);
-                break;
-            case CHARACTER:
-                RecognizeCharacter.recognize(pointList);
-                break;
         }
     }
 }

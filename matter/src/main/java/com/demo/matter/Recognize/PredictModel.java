@@ -66,7 +66,7 @@ public class PredictModel {
     }
 
 
-    public char predictDel(ListIterator<gPoint> li) throws Exception {
+    public char predictDel(ListIterator<gPoint> li) {
         float my_x[][][][] = preProcess1(li);
         int maxindex;
         Tensor x = Tensor.create(my_x);
@@ -97,14 +97,10 @@ public class PredictModel {
             gPoint g = li.next();
             int x = (int) g.getX();
             int y = (int) g.getY();
-            if (x < xmin)
-                xmin = x;
-            if (x > xmax)
-                xmax = x;
-            if (y < ymin)
-                ymin = y;
-            if (y > ymax)
-                ymax = y;
+            if (x < xmin) xmin = x;
+            if (x > xmax) xmax = x;
+            if (y < ymin) ymin = y;
+            if (y > ymax) ymax = y;
         }
 
         int xymaxlen, xyminlen;

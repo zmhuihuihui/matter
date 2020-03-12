@@ -6,7 +6,8 @@ import java.util.List;
 
 public class RecognizeCharacter {
 
-    public static String recognize(List<gPoint> pointList){
-        return null;
+    public static String  recognize(List<gPoint> pointList){
+        PredictModel model = new PredictModel();
+        return Character.toString(model.predictChinese(pointList.listIterator()));
     }
 }
