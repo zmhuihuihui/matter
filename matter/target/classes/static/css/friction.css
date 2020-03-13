@@ -1,0 +1,105 @@
+html{
+    width: 100%;
+    height: 100%;
+    margin: 0;
+    padding: 0;
+
+}
+body{
+    width: 95%;
+    height: 95%;
+    margin:10px auto;
+    padding: 0;
+
+}
+#title{
+   width:100%;
+   height: 10%;
+    font-family: Arial;
+    font-size: 2em;
+    font-weight: bolder;
+}
+#main{
+    width:100%;
+    height: 90%;
+    border: 1px solid silver;
+
+}
+#tool{
+    width: 100%;
+    height: 10%;
+    margin:0;
+    padding: 0;
+
+}
+span{
+    height:80%;
+    width: 120px;
+    margin-top: 10px;
+    margin-left: 10px;
+    float: left;
+    padding: 0px;
+    font-size:1.4em;
+    text-align:center;
+    background-color:#C0C0C0 ;
+    color: white;
+}
+#pic{
+    margin: 0;
+    width: 100%;
+    height: 90%;
+    padding: 0;
+    float: bottom;
+}
+
+input{
+    float: right;
+}
+
+#pause,#start{
+    margin-right: 8px;
+    margin-top: 10px;
+    background-position:center;
+    margin-bottom: 0;
+    width: 40px;
+    height: 40px;
+    border:none;
+    background-color: white;
+}
+
+#pause,#start:focus{
+    border: 1px solid white;
+    outline: none;
+}
+
+/*range*/
+input[type=range] {
+    -webkit-appearance: none;
+    margin-top: 15px;
+    margin-right: 15px;
+    width: 120px;
+    height: 25px;
+    border-radius: 10px; /*这个属性设置使填充进度条时的图形为圆角*/
+}
+input[type=range]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+}
+input[type=range]::-webkit-slider-runnable-track {
+    height: 8px;
+    border-radius: 10px; /*将轨道设为圆角的*/
+    box-shadow: 0 1px 1px #def3f8, inset 0 .125em .125em #0d1112; /*轨道内置阴影效果*/
+    background-color: cadetblue;
+}
+input[type=range]:focus {
+    outline: none;
+}
+input[type=range]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    height: 18px;
+    width: 18px;
+    margin-top: -5px; /*使滑块超出轨道部分的偏移量相等*/
+    background: #ffffff;
+    border-radius: 50%; /*外观设置为圆形*/
+    border: solid 0.125em rgba(205, 224, 230, 0.5); /*设置边框*/
+    box-shadow: 0 .125em .125em #3b4547; /*添加底部阴影*/
+}
