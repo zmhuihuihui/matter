@@ -44,6 +44,7 @@ $(function () {
         Bodies.rectangle(700, 800, 1400, 50, {isStatic: true}),
         Bodies.rectangle(1400, 400, 50, 800, {isStatic: true}),
         Bodies.rectangle(0, 400, 50, 800, {isStatic: true})
+
     ]);
 
 
@@ -133,54 +134,107 @@ $(function () {
     var yPoint = [];
     var constraintList = new Set();
 
+    /**
+     * 说明
+     * 化学组那边的逻辑是 前端页面 鼠标按下-移动-抬起 为一个笔画，每次往后端传笔画 ，后端有个容器 存笔画
+     * 等到前端 抬起笔 停留时间 超过阈值 ，触发识别
+     *
+     * 在前端存笔画  (目前抽象程度不高 考虑为以后 手写识别留的接口)
+     *
+     */
+
+
+
+    function collectStrokes(e){
+        xPoint.push(e.pageX - this.offsetLeft);
+        yPoint.push(e.pageY - this.offsetTop);
+    }
+
+    function recogniseGeometry(){
+        if ( paint == false ) {
+            $.ajax({
+                url: "http://127.0.0.1:8080/friction/handle",
+                type: "POST",
+                data: {
+                    xPoint: xPoint,
+                    yPoint: yPoint
+                },
+                async: false,
+                cache: false,
+                traditional: true,
+                success: function (data) {
+                    if (data.success) {
+                        console.log("识别成功");
+
+                        var path = String(data.path);
+                        var pointVector = Vertices.fromPath(path);
+                        var shape = Bodies.fromVertices(data.startX, data.startY, pointVector, {
+                            friction: 0.006
+                        });
+                        var constraint = Constraint.create({
+                            pointA: {x: data.startX, y: data.startY},
+                            bodyB: shape,
+                            length: 0
+                        });
+                        constraintList.add(constraint);
+                        World.add(world, [shape, constraint]);
+
+                    }else {
+                        console.log("识别失败");
+                    }
+                    console.log("成没成功她都得清空");
+                    xPoint = [];
+                    yPoint = [];
+                    ctx.clearRect(0, 0, 1400, 800);
+                },
+                error:function(){
+                    xPoint = [];
+                    yPoint = [];
+                }
+            });
+
+
+        }
+    }
+
     $('#canvas').mousedown(function (e) {
-        paint = !paint;
-        xPoint = [];
-        yPoint = [];
+        paint = true;
+        if( handler != null ) clearTimeout(handler);
+
+        // xPoint = [];
+        // yPoint = [];
         ctx.beginPath();
         ctx.moveTo(e.pageX - this.offsetLeft, e.pageY - this.offsetTop);
     });
 
     $('#canvas').mousemove(function (e) {
-        if (paint) {
+        if (paint == true ) {
             ctx.lineTo(e.pageX - this.offsetLeft, e.pageY - this.offsetTop);
+
             xPoint.push(e.pageX - this.offsetLeft);
             yPoint.push(e.pageY - this.offsetTop);
+
             ctx.strokeStyle = 'white';
             ctx.stroke();
         }
     });
 
     $('#canvas').mouseup(function (e) {
-        paint = !paint;
-        $.ajax({
-            url: "http://127.0.0.1:8080/friction/handle",
-            type: "POST",
-            data: {
-                xPoint: xPoint,
-                yPoint: yPoint
-            },
-            async: false,
-            cache: false,
-            traditional: true,
-            success: function (data) {
-                if (data.success) {
-                    var path = String(data.path);
-                    var pointVector = Vertices.fromPath(path);
-                    var shape = Bodies.fromVertices(data.startX,data.startY,pointVector,{
-                        friction: 0.006
-                    });
-                    var constraint = Constraint.create({
-                        pointA: { x: data.startX, y: data.startY },
-                        bodyB: shape,
-                        length: 0
-                    });
-                    constraintList.add(constraint);
-                    World.add(world,[shape,constraint]);
+        paint = false ;
+
+        if( paint == false ){
+            handler = setTimeout(function () {
+                if( paint == false ){
+                    clearTimeout(handler);
+
+                    console.log("该执行识别了");
+                    recogniseGeometry();
+
                 }
-            }
-        });
-        ctx.clearRect(0,0,1400,800);
+            },2500);
+        }else {
+            if( handler != null ) clearTimeout(handler);
+        }
 
     });
 
