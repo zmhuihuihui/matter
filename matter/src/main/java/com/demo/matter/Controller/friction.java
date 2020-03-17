@@ -33,6 +33,7 @@ public class friction {
         return "friction";
     }
 
+    @CrossOrigin(origins = "*")
     @ResponseBody
     @RequestMapping(value = "/friction/handle",method = RequestMethod.POST)
     public Map<String,Object> function(String[] xPoint, String[] yPoint){

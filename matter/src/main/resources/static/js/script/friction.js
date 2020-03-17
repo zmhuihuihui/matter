@@ -12,6 +12,10 @@ $(function () {
         Composites = Matter.Composites,
         MouseConstraint = Matter.MouseConstraint,
         Events = Matter.Events;
+    //kert2020 用于保存创建的所有body,在表格中展示body的speed
+    let tablebody=[];
+    //kert2020
+
 
     // create engine
     var engine = Engine.create(),
@@ -44,7 +48,6 @@ $(function () {
         Bodies.rectangle(700, 800, 1400, 50, {isStatic: true}),
         Bodies.rectangle(1400, 400, 50, 800, {isStatic: true}),
         Bodies.rectangle(0, 400, 50, 800, {isStatic: true})
-
     ]);
 
 
@@ -239,5 +242,28 @@ $(function () {
     });
 
 
+    //kert2020
+    //1初始化
+        //1.1初始化表格，获取表格对象，获取表格选项对象
+    obj=initTable();
+    let myChart=obj.myChart;
+    let option=obj.option;
+        //1.2初始化计时器对象
+    let currentTimeOut;
+
+    //2.控制图像绘制的开关
+    $(document).ready(function(){
+        $("#tableStart").click(function(){
+            if($("#tableStart").text()=="开始"){
+                $("#tableStart").text("暂停");
+                currentTimeOut=startDrawTable(tablebody,0,myChart,option);
+            }else{
+                $("#tableStart").text("开始");
+                clearInterval(currentTimeOut);
+            }
+        });
+    });
+
+    //kert2020
 });
 
