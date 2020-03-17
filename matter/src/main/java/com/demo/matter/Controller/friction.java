@@ -47,9 +47,9 @@ public class friction {
             list.add(new gPoint(Integer.parseInt(xPoint[i]),Integer.parseInt(yPoint[i])));
         }
         Object[] rst = RecognizeCommon.recognize(list);
-
+        
         //TODO 优化实现
-        if(rst[2] !=null && rst[2] != ""){
+        if(rst[2] != null && rst[2] != ""){
             model.put("startX",rst[0]);
             model.put("startY",rst[1]);
             model.put("path",rst[2]);

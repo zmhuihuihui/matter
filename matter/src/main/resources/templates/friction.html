@@ -6,7 +6,7 @@
     <link rel="stylesheet" href="../static/css/friction.css">
     <script src="https://cdn.bootcss.com/matter-js/0.12.0/matter.js"></script>
     <script src="https://code.jquery.com/jquery-3.1.1.min.js"></script>
-    <script src="../static/js/script/fric.js"></script>
+    <script src="../static/js/script/friction.js"></script>
 
 </head>
 <body>
@@ -17,9 +17,9 @@
         <span >状态</span>
         <input id="state" type="checkbox" checked style="float: left">画图模式</input>
 
-        <input id="start" type="button" name="start" style="background-image: url(../static/pic/start.png);background-repeat: no-repeat "/>
-        <input id="pause" type="button" name="restart" style="background-image: url(../static/pic/restart.png);background-repeat: no-repeat "/>
-        <input id="rangeMain" type="range" max="1.2" min="0" value="1" step="0.2" />
+        <input id="start" type="button" name="start" onclick ="afterClick()" style="background-image: url(../static/pic/start.png);background-repeat: no-repeat "/>
+        <input id="pause" type="button" name="restart" onclick ="afterClick()" style="background-image: url(../static/pic/restart.png);background-repeat: no-repeat "/>
+        <input id="rangeMain" type="range" max="1.2" min="0.2" value="1" step="0.2" />
 
     </div>
     <div id="pic">

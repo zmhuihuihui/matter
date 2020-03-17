@@ -1,5 +1,8 @@
 $(function () {
 
+    const width =$("canvas").width();
+    const height =$("canvas").height();
+
     var Engine = Matter.Engine,
         Render = Matter.Render,
         Runner = Matter.Runner,
@@ -12,22 +15,18 @@ $(function () {
         Composites = Matter.Composites,
         MouseConstraint = Matter.MouseConstraint,
         Events = Matter.Events;
-    //kert2020 用于保存创建的所有body,在表格中展示body的speed
-    let tablebody=[];
-    //kert2020
 
 
-    // create engine
     var engine = Engine.create(),
         world = engine.world;
 
-    // create renderer
     var render = Render.create({
-        element: document.body,
+        element: document.getElementById('pic'),
         engine: engine,
         options: {
-            width: 1400,
-            height: 800,
+            width: width,
+            height: height-2,
+            background:'#ffffff',
             showVelocity: true,
             showPositions: true,
             wireframes: false
@@ -36,22 +35,10 @@ $(function () {
 
     Render.run(render);
 
-    // create runner
     var runner = Runner.create();
     Runner.run(runner, engine);
 
 
-    // add bodies
-    World.add(world, [
-        // walls
-        Bodies.rectangle(700, 0, 1400, 50, {isStatic: true}),
-        Bodies.rectangle(700, 800, 1400, 50, {isStatic: true}),
-        Bodies.rectangle(1400, 400, 50, 800, {isStatic: true}),
-        Bodies.rectangle(0, 400, 50, 800, {isStatic: true})
-    ]);
-
-
-    // add mouse control
     var mouse = Mouse.create(render.canvas),
         mouseConstraint = MouseConstraint.create(engine, {
             mouse: mouse,
@@ -65,8 +52,7 @@ $(function () {
     World.add(world, mouseConstraint);
     render.mouse = mouse;
 
-
-
+    //鼠标拖拽
     Events.on(mouseConstraint, "startdrag", function (e) {
         for(var c of constraintList){
             if (e.body == c.bodyB) {
@@ -76,62 +62,46 @@ $(function () {
         }
     });
 
-    /*
-    var paint = false;
-    var xPoint = [];
-    var yPoint = [];
-    var ctx = render.context;
-
-    Events.on(render, 'beforeRender', function() {
-
-        Events.on(mouseConstraint, "mousedown", function (e) {
-            paint = !paint;
-            xPoint = [];
-            yPoint = [];
-            ctx.beginPath();
-            ctx.moveTo(mouse.position.x, mouse.position.y);
-        });
-
-        Events.on(mouseConstraint, "mousemove", function (e) {
-            if (paint) {
-
-                ctx.lineTo(mouse.position.x, mouse.position.y);
-                xPoint.push(mouse.position.x);
-                yPoint.push(mouse.position.y);
-                ctx.strokeStyle = 'green';
-                ctx.lineWidth = 1;
-                ctx.stroke();
-            }
-
-        });
-        Events.on(mouseConstraint, "mouseup", function (e) {
-            paint = !paint;
-        });
-    });
-
-     */
-
-
     //可视窗口大小
     Render.lookAt(render, {
         min: {x: 0, y: 0},
-        max: {x: 1400, y: 800}
+        max: {x: width, y: height}
     });
 
-    $('.jtoggler').jtoggler();
-    $(document).on('jt:toggled', function(event, target) {
-        if($(target).prop('checked') == true){
+    //画布边界
+    World.add(world, [
+        //Bodies.rectangle(700, 0, 1400, 50, {isStatic: true}),
+        //Bodies.rectangle(0, 0, width, 50, {isStatic: true}),
+        //Bodies.rectangle(width, 0, 50, height, {isStatic: true}),
+        Bodies.rectangle(0, height, width*2, 50, {isStatic: true})
+    ]);
+
+    //动画速度调节
+    $('#rangeMain').bind('input propertychange',function(){
+        engine.timing.timeScale = $('#rangeMain').val();
+    });
+
+    $("#state").click(function () {
+        if ($(this).prop("checked")) {
             document.getElementById("canvas").style.display = 'block';
-        }else{
+        } else {
             document.getElementById("canvas").style.display = 'none';
         }
-
     });
+
+    //开始暂停按钮
+    $("#start").click(() => {
+        document.getElementById("canvas").style.display = 'block';
+    });
+    $("#pause").click(() => {
+        document.getElementById("canvas").style.display = 'none';
+    });
+
 
     var cnv = document.getElementById('canvas');
     var ctx = cnv.getContext('2d');
     ctx.fillStyle = 'rgba(255,0,0,0)';
-    ctx.fillRect(0, 0, 1400, 800);
+    ctx.fillRect(0, 0, width, height);
     var paint = false;
     var xPoint = [];
     var yPoint = [];
@@ -188,7 +158,7 @@ $(function () {
                     console.log("成没成功她都得清空");
                     xPoint = [];
                     yPoint = [];
-                    ctx.clearRect(0, 0, 1400, 800);
+                    ctx.clearRect(0, 0, width, height);
                 },
                 error:function(){
                     xPoint = [];
@@ -217,7 +187,7 @@ $(function () {
             xPoint.push(e.pageX - this.offsetLeft);
             yPoint.push(e.pageY - this.offsetTop);
 
-            ctx.strokeStyle = 'white';
+            ctx.strokeStyle = 'black';
             ctx.stroke();
         }
     });
@@ -241,6 +211,8 @@ $(function () {
 
     });
 
+    //kert2020 用于保存创建的所有body,在表格中展示body的speed
+    let tablebody=[];
 
     //kert2020
     //1初始化

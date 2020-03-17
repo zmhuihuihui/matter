@@ -17,10 +17,13 @@ public class RecognizeCommon {
 
 
     public static Object[] recognize(List<gPoint> pointList) {
+        //TODO 删除手势
+        /*
         if(RecognizeDel.recognize(pointList) != '0'){
-            //TODO 删除手势
+
             return null;
         }
+        */
 
         //状态切换
         String StatusChange = RecognizeStatusChange.recognize(pointList);
