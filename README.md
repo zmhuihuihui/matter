@@ -22,6 +22,7 @@
 ### 2.3 使用实例
         建议绑定物理仿真的开始按钮，单击开始按钮，同时开始/结束物理仿真和速度记录
         <button id="tableStart">开始</button>
+        <div id="table" style="width: 50%; height: 280px"></div>
         
         
         <script>
