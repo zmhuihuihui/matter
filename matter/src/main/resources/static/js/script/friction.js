@@ -19,7 +19,7 @@ $(function () {
 
     // create renderer
     var render = Render.create({
-        element: document.body,
+        element: document.getElementById('pic'),
         engine: engine,
         options: {
             width: 1400,
