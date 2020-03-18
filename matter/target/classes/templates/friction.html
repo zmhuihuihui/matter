@@ -1,6 +1,51 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    <meta charset="UTF-8">
+    <title>物理实验</title>
+    <link rel="stylesheet" href="../static/css/friction.css">
+    <script src="https://cdn.bootcss.com/matter-js/0.12.0/matter.js"></script>
+    <script src="https://code.jquery.com/jquery-3.1.1.min.js"></script>
+    <script src="../static/js/script/friction.js"></script>
+    <script src="../static/js/script/echarts.js"></script>
+    <script src="../static/js/script/tableUtil.js"></script>
+
+</head>
+<body>
+<div id="title">滑动摩擦力实验</div>
+
+<div id="main">
+    <div id="tool">
+        <span>状态</span> <!-- TODO 状态显示及切换-->
+
+        <input id="start" type="button" name="start" checked
+               style="background:url(../static/pic/start.png) no-repeat "/>
+        <input id="restart" type="button" name="restart" style="background:url(../static/pic/restart.png) no-repeat "/>
+        <input id="rangeMain" type="range" max="1.2" min="0.2" value="0.8" step="0.2"/>
+
+    </div>
+    <div id="pic">
+        <canvas id="canvas" style="position: absolute" width="100%" height="100%"></canvas>
+    </div>
+</div>
+
+<div id="table" style="width: 50%; height: 280px"></div>
+<script>
+    const height = document.getElementById('pic').offsetHeight;
+    const width = document.getElementById('pic').offsetWidth;
+    //alert(document.getElementById('pic').offsetHeight);
+    document.getElementById('canvas').width = width;
+    document.getElementById('canvas').height = height;
+
+</script>
+
+</body>
+</html>
+
+<!--
+<!DOCTYPE html>
+<html lang="en">
+<head>
     <meta charset="UTF-8"/>
     <title>Demo</title>
 
@@ -8,15 +53,23 @@
     <script src="https://code.jquery.com/jquery-3.1.1.min.js"></script>
     <link rel="stylesheet" href="https://sinneren.github.io/jToggler/jtoggler.styles.css">
     <script src="https://sinneren.github.io/jToggler/jtoggler.js"></script>
+    <script src="../static/js/script/echarts.js"></script>
+    <script src="../static/js/script/tableUtil.js"></script>
 </head>
 
 <body>
 <input type="checkbox" checked class="jtoggler">画图模式</input>
+<button id="tableStart">开始</button>
 <canvas style="position: absolute; display: block" id="canvas" width="1400" height="800"></canvas>
 <script src="../static/js/script/friction.js"></script>
+<div id="table" style="width: 50%; height: 280px"></div>
 
 
 
 </body>
 
 </html>
+-->
+
+
+
