@@ -76,6 +76,8 @@ function  initTable(){
 function startDrawTable(drawBodies,time,myChart,option){
 
     console.log("startDrawTalbe is invoked");
+    option.xAxis.data=[];
+    option.series=[];
     let timeOut1 = setInterval(function () {
         option.xAxis.data.push(((time++)*0.01).toFixed(2));
         // console.log(drawBodies);

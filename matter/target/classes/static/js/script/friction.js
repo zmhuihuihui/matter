@@ -258,20 +258,6 @@ $(function () {
     //2.控制图像绘制的开关
     $(document).ready(function () {
         $("#start").click(function () {
-            // console.log("checked is clicked?");
-            // console.log($("#start").prop("checked"));
-            // //开始
-            // if ($("#start").prop("checked")) {
-            //     console.log("tablebody: ",tablebody);
-            //     currentTimeOut = startDrawTable(tablebody, 0, myChart, option);
-            // }
-            // //暂停
-            // else {
-            //     clearInterval(currentTimeOut);
-            // }
-
-
-
             // if ($("#start").text() == "开始") {
             //     $("#start").text("暂停");
             //     console.log("tablebody: ",tablebody);
