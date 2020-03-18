@@ -6,6 +6,7 @@
 
 // 初始化对象，获取表格对象，获取表格选项对象
 function  initTable(){
+    console.log("initTable is invoked");
     let myChart=echarts.init(document.getElementById("table"));
     let option = {
         tooltip: {
@@ -74,6 +75,7 @@ function  initTable(){
 
 function startDrawTable(drawBodies,time,myChart,option){
 
+    console.log("startDrawTalbe is invoked");
     let timeOut1 = setInterval(function () {
         option.xAxis.data.push(((time++)*0.01).toFixed(2));
         // console.log(drawBodies);

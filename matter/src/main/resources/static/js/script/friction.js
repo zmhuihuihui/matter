@@ -92,12 +92,18 @@ $(function () {
                 World.remove(world, con);
             }
             //TODO 开启引擎，记录滑块初始位置
+            //开启图表绘制
+            console.log("tablebody: ",tablebody);
+            currentTimeOut = startDrawTable(tablebody, 0, myChart, option);
         }
         //暂停
         else {
             $(this).attr("checked", true).css('background', "url(../static/pic/start.png) no-repeat");
             document.getElementById("canvas").style.display = 'block';
             //TODO 暂停引擎以图表
+            //结束图表绘制
+            clearInterval(currentTimeOut);
+
         }
     });
 
@@ -172,6 +178,7 @@ $(function () {
                         });
                         constraintList.add(constraint);
                         World.add(world, [shape, constraint]);
+                        tablebody.push(shape);
 
                     } else {
                         console.log("识别失败");
@@ -250,17 +257,15 @@ $(function () {
 
     //2.控制图像绘制的开关
     $(document).ready(function () {
-        $("#tableStart").click(function () {
-
-            //TODO 合并到开始暂停按钮
-
-            if ($("#tableStart").text() == "开始") {
-                $("#tableStart").text("暂停");
-                currentTimeOut = startDrawTable(tablebody, 0, myChart, option);
-            } else {
-                $("#tableStart").text("开始");
-                clearInterval(currentTimeOut);
-            }
+        $("#start").click(function () {
+            // if ($("#start").text() == "开始") {
+            //     $("#start").text("暂停");
+            //     console.log("tablebody: ",tablebody);
+            //     currentTimeOut = startDrawTable(tablebody, 0, myChart, option);
+            // } else {
+            //     $("#start").text("开始");
+            //     clearInterval(currentTimeOut);
+            // }
         });
     });
 
