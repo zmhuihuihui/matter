@@ -17,10 +17,13 @@ public class RecognizeCommon {
 
 
     public static Object[] recognize(List<gPoint> pointList) {
+        //TODO 删除手势
+        /*
         if(RecognizeDel.recognize(pointList) != '0'){
-            //TODO 删除手势
+
             return null;
         }
+        */
 
         //状态切换
         String StatusChange = RecognizeStatusChange.recognize(pointList);
@@ -36,7 +39,7 @@ public class RecognizeCommon {
                 //resultType = RecognizeShape.recognize(pointList);
                 resultType = RecognizeUtil.recognize(pointList);
                 break;
-            case CHARACTER:
+            case CHAR:
                 //TODO 字符识别
                 //resultType = RecognizeCharacter.recognize(pointList);
                 break;
@@ -52,7 +55,7 @@ public class RecognizeCommon {
             case "shape":
                 return DrawStatus.SHAPE;
             case "character":
-                return DrawStatus.CHARACTER;
+                return DrawStatus.CHAR;
             default:
                 throw new DrawStatusException();
         }

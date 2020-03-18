@@ -1,5 +1,8 @@
 //以下代码用于处理表格
 
+//TODO 添加js到html，建议echarts使用CDN地址引用，没必要将源码放到工程里
+
+
 
 // 初始化对象，获取表格对象，获取表格选项对象
 function  initTable(){

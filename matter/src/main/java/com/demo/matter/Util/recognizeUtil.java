@@ -21,6 +21,11 @@ public class RecognizeUtil {
         int maxPreY = Integer.MIN_VALUE;
         int minPreY = Integer.MAX_VALUE;
 
+        /**
+         * 0 : 中心点横坐标
+         * 1 : 中心点纵坐标
+         * 2 : 路径
+         */
         Object[] rst = new Object[3];
 
         //获取图形的边界值
@@ -36,6 +41,7 @@ public class RecognizeUtil {
 
         rst[0] = (int)(minPreX + xLength/2);
         rst[1] = (int)(minPreY + yLength/2);
+        rst[2] = "";
 
         int[] count = new int[16];
 
@@ -84,7 +90,6 @@ public class RecognizeUtil {
                 rst[2] += minPreX + " " + maxPreY;
             }
         }
-
         return rst;
 
     }
