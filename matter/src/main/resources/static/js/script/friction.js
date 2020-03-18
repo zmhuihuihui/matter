@@ -81,31 +81,30 @@ $(function () {
         engine.timing.timeScale = $('#rangeMain').val();
     });
 
-    //开始 暂停 重制
-    $('#start').click(function () {
-        document.getElementById("canvas").style.display = 'none';
-        engine.enabled = true;
-        for (var con of constraintList) {
-            World.remove(world, con);
+    //开始/暂停按钮
+    $("#start").click(function () {
+
+        //开始
+        if ($(this).prop("checked")) {
+            $(this).css('background', "url(../static/pic/pause.png) no-repeat").attr("checked", false);
+            document.getElementById("canvas").style.display = 'none';
+            for (var con of constraintList) {
+                World.remove(world, con);
+            }
+            //TODO 开启引擎，记录滑块初始位置
         }
-        //TODO 记录滑块初始位置
+        //暂停
+        else {
+            $(this).attr("checked", true).css('background', "url(../static/pic/start.png) no-repeat");
+            document.getElementById("canvas").style.display = 'block';
+            //TODO 暂停引擎以图表
+        }
     });
-    $('#pause').click(function () {
-        document.getElementById("canvas").style.display = 'block';
-        engine.enabled = false;
-    });
+
+    //重制按钮
     $('#restart').click(function () {
         //TODO 回到初始状态
     });
-
-
-    /* $("#state").click(function () {
-         if ($(this).prop("checked")) {
-             document.getElementById("canvas").style.display = 'block';
-         } else {
-             document.getElementById("canvas").style.display = 'none';
-         }
-     });*/
 
 
     var cnv = document.getElementById('canvas');
@@ -159,8 +158,8 @@ $(function () {
 
 
 
-                        //TODO 识别为三角形默认固定，计算坐标贴合地面
-                        //TODO 识别为长方形，计算坐标贴合斜面
+                            //TODO 识别为三角形默认固定，计算坐标贴合地面
+                            //TODO 识别为长方形，计算坐标贴合斜面
                         var path = String(data.path);
                         var pointVector = Vertices.fromPath(path);
                         var shape = Bodies.fromVertices(data.startX, data.startY, pointVector, {
