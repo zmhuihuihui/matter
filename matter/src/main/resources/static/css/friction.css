@@ -33,8 +33,9 @@ body{
 
 }
 span{
-    height:80%;
+    height:50px;
     width: 120px;
+    line-height: 50px;
     margin-top: 10px;
     margin-left: 10px;
     float: left;

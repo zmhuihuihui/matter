@@ -46,10 +46,11 @@ public class friction {
         Object[] rst = RecognizeCommon.recognize(list);
 
         //TODO 优化实现
-        if (rst[2] != null && rst[2] != "") {
+        if (rst[2] != null && rst[2] != "" && rst[3] != null) {
             model.put("startX", rst[0]);
             model.put("startY", rst[1]);
             model.put("path", rst[2]);
+            model.put("type",rst[3]);
             model.put("success", true);
         } else {
             model.put("success", false);

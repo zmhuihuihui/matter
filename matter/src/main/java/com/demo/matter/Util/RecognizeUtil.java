@@ -26,7 +26,7 @@ public class RecognizeUtil {
          * 1 : 中心点纵坐标
          * 2 : 路径
          */
-        Object[] rst = new Object[3];
+        Object[] rst = new Object[4];
 
         //获取图形的边界值
         for (gPoint point : trail) {
@@ -42,6 +42,7 @@ public class RecognizeUtil {
         rst[0] = (int)(minPreX + xLength/2);
         rst[1] = (int)(minPreY + yLength/2);
         rst[2] = "";
+        rst[3] = null;
 
         int[] count = new int[16];
 
@@ -76,18 +77,21 @@ public class RecognizeUtil {
                 rst[2] += minPreX + " " + maxPreY + " ";
                 rst[2] += maxPreX + " " + maxPreY + " ";
                 rst[2] += maxPreX + " " + minPreY;
+                rst[3] = "RECTANGLE";
             }
             //左三角
             else if(left_triangle <= rectangle && left_triangle <= right_triangle){
                 rst[2] += minPreX + " " + minPreY + " ";
                 rst[2] += minPreX + " " + maxPreY + " ";
                 rst[2] += maxPreX + " " + maxPreY ;
+                rst[3] = "TRIANGLE";
             }
             //右三角
             else if(right_triangle <= left_triangle && right_triangle <= rectangle){
                 rst[2] += maxPreX + " " + minPreY + " ";
                 rst[2] += maxPreX + " " + maxPreY + " ";
                 rst[2] += minPreX + " " + maxPreY;
+                rst[3] = "TRIANGLE";
             }
         }
         return rst;
