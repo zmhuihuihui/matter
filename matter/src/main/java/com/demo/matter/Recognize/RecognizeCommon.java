@@ -39,7 +39,7 @@ public class RecognizeCommon {
                 //resultType = RecognizeShape.recognize(pointList);
                 resultType = RecognizeUtil.recognize(pointList);
                 break;
-            case CHARACTER:
+            case CHAR:
                 //TODO 字符识别
                 //resultType = RecognizeCharacter.recognize(pointList);
                 break;
@@ -55,7 +55,7 @@ public class RecognizeCommon {
             case "shape":
                 return DrawStatus.SHAPE;
             case "character":
-                return DrawStatus.CHARACTER;
+                return DrawStatus.CHAR;
             default:
                 throw new DrawStatusException();
         }

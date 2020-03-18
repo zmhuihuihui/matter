@@ -1,7 +1,7 @@
 $(function () {
 
-    const width =$("canvas").width();
-    const height =$("canvas").height();
+    const width = $("canvas").width();
+    const height = $("canvas").height();
 
     var Engine = Matter.Engine,
         Render = Matter.Render,
@@ -25,8 +25,8 @@ $(function () {
         engine: engine,
         options: {
             width: width,
-            height: height-2,
-            background:'#ffffff',
+            height: height - 2,
+            background: '#ffffff',
             showVelocity: true,
             showPositions: true,
             wireframes: false
@@ -54,10 +54,10 @@ $(function () {
 
     //鼠标拖拽
     Events.on(mouseConstraint, "startdrag", function (e) {
-        for(var c of constraintList){
-            if (e.body == c.bodyB) {
-                World.remove(world, c);
-                constraintList.delete(c);
+        for (var con of constraintList) {
+            if (e.body == con.bodyB) {
+                World.remove(world, con);
+                constraintList.delete(con);
             }
         }
     });
@@ -70,32 +70,42 @@ $(function () {
 
     //画布边界
     World.add(world, [
-        //Bodies.rectangle(700, 0, 1400, 50, {isStatic: true}),
-        //Bodies.rectangle(0, 0, width, 50, {isStatic: true}),
-        //Bodies.rectangle(width, 0, 50, height, {isStatic: true}),
-        Bodies.rectangle(0, height, width*2, 50, {isStatic: true})
+        Bodies.rectangle(0, 0, 50, height * 2, {isStatic: true}),
+        Bodies.rectangle(0, 0, width * 2, 50, {isStatic: true}),
+        Bodies.rectangle(width, 0, 50, height * 2, {isStatic: true}),
+        Bodies.rectangle(0, height, width * 2, 50, {isStatic: true})
     ]);
 
     //动画速度调节
-    $('#rangeMain').bind('input propertychange',function(){
+    $('#rangeMain').bind('input propertychange', function () {
         engine.timing.timeScale = $('#rangeMain').val();
     });
 
-    $("#state").click(function () {
-        if ($(this).prop("checked")) {
-            document.getElementById("canvas").style.display = 'block';
-        } else {
-            document.getElementById("canvas").style.display = 'none';
+    //开始 暂停 重制
+    $('#start').click(function () {
+        document.getElementById("canvas").style.display = 'none';
+        engine.enabled = true;
+        for (var con of constraintList) {
+            World.remove(world, con);
         }
+        //TODO 记录滑块初始位置
+    });
+    $('#pause').click(function () {
+        document.getElementById("canvas").style.display = 'block';
+        engine.enabled = false;
+    });
+    $('#restart').click(function () {
+        //TODO 回到初始状态
     });
 
-    //开始暂停按钮
-    $("#start").click(() => {
-        document.getElementById("canvas").style.display = 'block';
-    });
-    $("#pause").click(() => {
-        document.getElementById("canvas").style.display = 'none';
-    });
+
+    /* $("#state").click(function () {
+         if ($(this).prop("checked")) {
+             document.getElementById("canvas").style.display = 'block';
+         } else {
+             document.getElementById("canvas").style.display = 'none';
+         }
+     });*/
 
 
     var cnv = document.getElementById('canvas');
@@ -116,15 +126,13 @@ $(function () {
      *
      */
 
-
-
-    function collectStrokes(e){
+    function collectStrokes(e) {
         xPoint.push(e.pageX - this.offsetLeft);
         yPoint.push(e.pageY - this.offsetTop);
     }
 
-    function recogniseGeometry(){
-        if ( paint == false ) {
+    function recogniseGeometry() {
+        if (paint == false) {
             $.ajax({
                 url: "http://127.0.0.1:8080/friction/handle",
                 type: "POST",
@@ -138,7 +146,21 @@ $(function () {
                 success: function (data) {
                     if (data.success) {
                         console.log("识别成功");
+                        /**
+                         * TODO 后台还会返回识别type，完成不同type的逻辑
+                         * SHAPE : 识别图形
+                         * CHAR : 识别字符
+                         * DEL : 删除手势
+                         * TABLE : 图表手势
+                         * DRAW : 切换画图状态手势
+                         * CHARACTER : 切换字符状态手势
+                         * ...
+                         */
 
+
+
+                        //TODO 识别为三角形默认固定，计算坐标贴合地面
+                        //TODO 识别为长方形，计算坐标贴合斜面
                         var path = String(data.path);
                         var pointVector = Vertices.fromPath(path);
                         var shape = Bodies.fromVertices(data.startX, data.startY, pointVector, {
@@ -152,7 +174,7 @@ $(function () {
                         constraintList.add(constraint);
                         World.add(world, [shape, constraint]);
 
-                    }else {
+                    } else {
                         console.log("识别失败");
                     }
                     console.log("成没成功她都得清空");
@@ -160,7 +182,7 @@ $(function () {
                     yPoint = [];
                     ctx.clearRect(0, 0, width, height);
                 },
-                error:function(){
+                error: function () {
                     xPoint = [];
                     yPoint = [];
                 }
@@ -172,7 +194,7 @@ $(function () {
 
     $('#canvas').mousedown(function (e) {
         paint = true;
-        if( handler != null ) clearTimeout(handler);
+        if (handler != null) clearTimeout(handler);
 
         // xPoint = [];
         // yPoint = [];
@@ -181,7 +203,7 @@ $(function () {
     });
 
     $('#canvas').mousemove(function (e) {
-        if (paint == true ) {
+        if (paint == true) {
             ctx.lineTo(e.pageX - this.offsetLeft, e.pageY - this.offsetTop);
 
             xPoint.push(e.pageX - this.offsetLeft);
@@ -193,49 +215,55 @@ $(function () {
     });
 
     $('#canvas').mouseup(function (e) {
-        paint = false ;
+        paint = false;
 
-        if( paint == false ){
+        if (paint == false) {
             handler = setTimeout(function () {
-                if( paint == false ){
+                if (paint == false) {
                     clearTimeout(handler);
 
                     console.log("该执行识别了");
                     recogniseGeometry();
 
                 }
-            },2500);
-        }else {
-            if( handler != null ) clearTimeout(handler);
+            }, 1500);   //TODO 时间
+        } else {
+            if (handler != null) clearTimeout(handler);
         }
 
     });
 
+
+    //TODO 获取木块坐标，计算图像
+    //TODO 考虑下图像显示的位置大小，以及如何显示在画布之上
+
     //kert2020 用于保存创建的所有body,在表格中展示body的speed
-    let tablebody=[];
+    let tablebody = [];
 
     //kert2020
     //1初始化
-        //1.1初始化表格，获取表格对象，获取表格选项对象
-    obj=initTable();
-    let myChart=obj.myChart;
-    let option=obj.option;
-        //1.2初始化计时器对象
+    //1.1初始化表格，获取表格对象，获取表格选项对象
+    obj = initTable();
+    let myChart = obj.myChart;
+    let option = obj.option;
+    //1.2初始化计时器对象
     let currentTimeOut;
 
     //2.控制图像绘制的开关
-    $(document).ready(function(){
-        $("#tableStart").click(function(){
-            if($("#tableStart").text()=="开始"){
+    $(document).ready(function () {
+        $("#tableStart").click(function () {
+
+            //TODO 合并到开始暂停按钮
+
+            if ($("#tableStart").text() == "开始") {
                 $("#tableStart").text("暂停");
-                currentTimeOut=startDrawTable(tablebody,0,myChart,option);
-            }else{
+                currentTimeOut = startDrawTable(tablebody, 0, myChart, option);
+            } else {
                 $("#tableStart").text("开始");
                 clearInterval(currentTimeOut);
             }
         });
     });
 
-    //kert2020
 });
 
