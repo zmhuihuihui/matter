@@ -29,7 +29,8 @@ $(function () {
             background: '#ffffff',
             showVelocity: true,
             showPositions: true,
-            wireframes: false
+            wireframes: false,
+            enabled : false
         }
     });
 
@@ -52,7 +53,7 @@ $(function () {
     World.add(world, mouseConstraint);
     render.mouse = mouse;
 
-    //鼠标拖拽
+    //图形拖拽
     Events.on(mouseConstraint, "startdrag", function (e) {
         for (var con of constraintList) {
             if (e.body == con.bodyB) {
@@ -70,9 +71,9 @@ $(function () {
 
     //画布边界
     World.add(world, [
-        Bodies.rectangle(0, 0, 50, height * 2, {isStatic: true}),
-        Bodies.rectangle(0, 0, width * 2, 50, {isStatic: true}),
-        Bodies.rectangle(width, 0, 50, height * 2, {isStatic: true}),
+        Bodies.rectangle(-30, 0, 50, height * 2, {isStatic: true}),
+        Bodies.rectangle(0, -30, width * 2, 50, {isStatic: true}),
+        Bodies.rectangle(width+30, 0, 50, height * 2, {isStatic: true}),
         Bodies.rectangle(0, height, width * 2, 50, {isStatic: true})
     ]);
 
@@ -92,17 +93,16 @@ $(function () {
                 World.remove(world, con);
             }
             //TODO 开启引擎，记录滑块初始位置
-            //开启图表绘制
-            console.log("tablebody: ",tablebody);
             currentTimeOut = startDrawTable(tablebody, 0, myChart, option);
+            runner.enabled = true;
         }
         //暂停
         else {
             $(this).attr("checked", true).css('background', "url(../static/pic/start.png) no-repeat");
             document.getElementById("canvas").style.display = 'block';
             //TODO 暂停引擎以图表
-            //结束图表绘制
             clearInterval(currentTimeOut);
+            runner.enabled = false;
 
         }
     });
@@ -110,6 +110,7 @@ $(function () {
     //重制按钮
     $('#restart').click(function () {
         //TODO 回到初始状态
+        runner.enabled = false;
     });
 
 
@@ -168,18 +169,20 @@ $(function () {
                             //TODO 识别为长方形，计算坐标贴合斜面
                         var path = String(data.path);
                         var pointVector = Vertices.fromPath(path);
-                        var shape = Bodies.fromVertices(data.startX, data.startY, pointVector, {
-                            friction: 0.006
+                        var shape = Bodies.fromVertices(data.startX, data.startY,pointVector, {
+                            friction: 0
                         });
-                        var constraint = Constraint.create({
-                            pointA: {x: data.startX, y: data.startY},
-                            bodyB: shape,
-                            length: 0
-                        });
-                        constraintList.add(constraint);
-                        World.add(world, [shape, constraint]);
-                        tablebody.push(shape);
-
+                        World.add(world, shape);
+                        if(data.type == "RECTANGLE") {
+                            var constraint = Constraint.create({
+                                pointA: {x: data.startX, y: data.startY},
+                                bodyB: shape,
+                                length: 0
+                            });
+                            constraintList.add(constraint);
+                            World.add(world, constraint);
+                            tablebody.push(shape);
+                        }
                     } else {
                         console.log("识别失败");
                     }
@@ -211,7 +214,6 @@ $(function () {
     $('#canvas').mousemove(function (e) {
         if (paint == true) {
             ctx.lineTo(e.pageX - this.offsetLeft, e.pageY - this.offsetTop);
-
             xPoint.push(e.pageX - this.offsetLeft);
             yPoint.push(e.pageY - this.offsetTop);
 
@@ -227,12 +229,10 @@ $(function () {
             handler = setTimeout(function () {
                 if (paint == false) {
                     clearTimeout(handler);
-
                     console.log("该执行识别了");
                     recogniseGeometry();
-
                 }
-            }, 1500);   //TODO 时间
+            }, 500);   //TODO 时间
         } else {
             if (handler != null) clearTimeout(handler);
         }
@@ -242,6 +242,7 @@ $(function () {
 
     //TODO 获取木块坐标，计算图像
     //TODO 考虑下图像显示的位置大小，以及如何显示在画布之上
+    //TODO 根据动画速度动态改变时间增长率
 
     //kert2020 用于保存创建的所有body,在表格中展示body的speed
     let tablebody = [];
