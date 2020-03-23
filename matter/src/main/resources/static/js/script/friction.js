@@ -173,6 +173,7 @@ $(function () {
                             friction: 0
                         });
                         World.add(world, shape);
+                        tablebody.push(shape);
                         if(data.type == "RECTANGLE") {
                             var constraint = Constraint.create({
                                 pointA: {x: data.startX, y: data.startY},
@@ -181,7 +182,6 @@ $(function () {
                             });
                             constraintList.add(constraint);
                             World.add(world, constraint);
-                            tablebody.push(shape);
                         }
                     } else {
                         console.log("识别失败");
