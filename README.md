@@ -1,7 +1,7 @@
 # matter
 基于matter的手绘物理实验
 
-## 1、摩擦力实验
+### 1、摩擦力实验
 >接口地址：http://127.0.0.1:8080/friction
 
 ## 2.速度图像使用说明
@@ -23,6 +23,7 @@
         建议绑定物理仿真的开始按钮，单击开始按钮，同时开始/结束物理仿真和速度记录
         <button id="tableStart">开始</button>
         <div id="table" style="width: 50%; height: 280px"></div>
+        
         
         <script>
         $(document).ready(function(){
