@@ -1,5 +1,8 @@
 $(function () {
 
+    const width = $("canvas").width();
+    const height = $("canvas").height();
+
     var Engine = Matter.Engine,
         Render = Matter.Render,
         Runner = Matter.Runner,
@@ -13,42 +16,30 @@ $(function () {
         MouseConstraint = Matter.MouseConstraint,
         Events = Matter.Events;
 
-    // create engine
+
     var engine = Engine.create(),
         world = engine.world;
 
-    // create renderer
     var render = Render.create({
         element: document.getElementById('pic'),
         engine: engine,
         options: {
-            width: 1400,
-            height: 800,
+            width: width,
+            height: height - 2,
+            background: '#ffffff',
             showVelocity: true,
             showPositions: true,
-            wireframes: false
+            wireframes: false,
+            enabled : false
         }
     });
 
     Render.run(render);
 
-    // create runner
     var runner = Runner.create();
     Runner.run(runner, engine);
 
 
-    // add bodies
-    World.add(world, [
-        // walls
-        Bodies.rectangle(700, 0, 1400, 50, {isStatic: true}),
-        Bodies.rectangle(700, 800, 1400, 50, {isStatic: true}),
-        Bodies.rectangle(1400, 400, 50, 800, {isStatic: true}),
-        Bodies.rectangle(0, 400, 50, 800, {isStatic: true})
-
-    ]);
-
-
-    // add mouse control
     var mouse = Mouse.create(render.canvas),
         mouseConstraint = MouseConstraint.create(engine, {
             mouse: mouse,
@@ -62,73 +53,71 @@ $(function () {
     World.add(world, mouseConstraint);
     render.mouse = mouse;
 
-
-
+    //图形拖拽
     Events.on(mouseConstraint, "startdrag", function (e) {
-        for(var c of constraintList){
-            if (e.body == c.bodyB) {
-                World.remove(world, c);
-                constraintList.delete(c);
+        for (var con of constraintList) {
+            if (e.body == con.bodyB) {
+                World.remove(world, con);
+                constraintList.delete(con);
             }
         }
     });
-
-    /*
-    var paint = false;
-    var xPoint = [];
-    var yPoint = [];
-    var ctx = render.context;
-
-    Events.on(render, 'beforeRender', function() {
-
-        Events.on(mouseConstraint, "mousedown", function (e) {
-            paint = !paint;
-            xPoint = [];
-            yPoint = [];
-            ctx.beginPath();
-            ctx.moveTo(mouse.position.x, mouse.position.y);
-        });
-
-        Events.on(mouseConstraint, "mousemove", function (e) {
-            if (paint) {
-
-                ctx.lineTo(mouse.position.x, mouse.position.y);
-                xPoint.push(mouse.position.x);
-                yPoint.push(mouse.position.y);
-                ctx.strokeStyle = 'green';
-                ctx.lineWidth = 1;
-                ctx.stroke();
-            }
-
-        });
-        Events.on(mouseConstraint, "mouseup", function (e) {
-            paint = !paint;
-        });
-    });
-
-     */
-
 
     //可视窗口大小
     Render.lookAt(render, {
         min: {x: 0, y: 0},
-        max: {x: 1400, y: 800}
+        max: {x: width, y: height}
     });
 
-    $('.jtoggler').jtoggler();
-    $(document).on('jt:toggled', function(event, target) {
-        if($(target).prop('checked') == true){
-            document.getElementById("canvas").style.display = 'block';
-        }else{
+    //画布边界
+    World.add(world, [
+        Bodies.rectangle(-30, 0, 50, height * 2, {isStatic: true}),
+        Bodies.rectangle(0, -30, width * 2, 50, {isStatic: true}),
+        Bodies.rectangle(width+30, 0, 50, height * 2, {isStatic: true}),
+        Bodies.rectangle(0, height, width * 2, 50, {isStatic: true})
+    ]);
+
+    //动画速度调节
+    $('#rangeMain').bind('input propertychange', function () {
+        engine.timing.timeScale = $('#rangeMain').val();
+    });
+
+    //开始/暂停按钮
+    $("#start").click(function () {
+
+        //开始
+        if ($(this).prop("checked")) {
+            $(this).css('background', "url(../static/pic/pause.png) no-repeat").attr("checked", false);
             document.getElementById("canvas").style.display = 'none';
+            for (var con of constraintList) {
+                World.remove(world, con);
+            }
+            //TODO 开启引擎，记录滑块初始位置
+            currentTimeOut = startDrawTable(tablebody, 0, myChart, option);
+            runner.enabled = true;
         }
+        //暂停
+        else {
+            $(this).attr("checked", true).css('background', "url(../static/pic/start.png) no-repeat");
+            document.getElementById("canvas").style.display = 'block';
+            //TODO 暂停引擎以图表
+            clearInterval(currentTimeOut);
+            runner.enabled = false;
 
+        }
     });
+
+    //重制按钮
+    $('#restart').click(function () {
+        //TODO 回到初始状态
+        runner.enabled = false;
+    });
+
 
     var cnv = document.getElementById('canvas');
     var ctx = cnv.getContext('2d');
     ctx.fillStyle = 'rgba(255,0,0,0)';
-    ctx.fillRect(0, 0, 1400, 800);
+    ctx.fillRect(0, 0, width, height);
     var paint = false;
     var xPoint = [];
     var yPoint = [];
@@ -143,15 +132,13 @@ $(function () {
      *
      */
 
-
-
-    function collectStrokes(e){
+    function collectStrokes(e) {
         xPoint.push(e.pageX - this.offsetLeft);
         yPoint.push(e.pageY - this.offsetTop);
     }
 
-    function recogniseGeometry(){
-        if ( paint == false ) {
+    function recogniseGeometry() {
+        if (paint == false) {
             $.ajax({
                 url: "http://127.0.0.1:8080/friction/handle",
                 type: "POST",
@@ -165,29 +152,46 @@ $(function () {
                 success: function (data) {
                     if (data.success) {
                         console.log("识别成功");
+                        /**
+                         * TODO 后台还会返回识别type，完成不同type的逻辑
+                         * SHAPE : 识别图形
+                         * CHAR : 识别字符
+                         * DEL : 删除手势
+                         * TABLE : 图表手势
+                         * DRAW : 切换画图状态手势
+                         * CHARACTER : 切换字符状态手势
+                         * ...
+                         */
 
+
+
+                            //TODO 识别为三角形默认固定，计算坐标贴合地面
+                            //TODO 识别为长方形，计算坐标贴合斜面
                         var path = String(data.path);
                         var pointVector = Vertices.fromPath(path);
-                        var shape = Bodies.fromVertices(data.startX, data.startY, pointVector, {
-                            friction: 0.006
+                        var shape = Bodies.fromVertices(data.startX, data.startY,pointVector, {
+                            friction: 0
                         });
-                        var constraint = Constraint.create({
-                            pointA: {x: data.startX, y: data.startY},
-                            bodyB: shape,
-                            length: 0
-                        });
-                        constraintList.add(constraint);
-                        World.add(world, [shape, constraint]);
-
-                    }else {
+                        World.add(world, shape);
+                        if(data.type == "RECTANGLE") {
+                            var constraint = Constraint.create({
+                                pointA: {x: data.startX, y: data.startY},
+                                bodyB: shape,
+                                length: 0
+                            });
+                            constraintList.add(constraint);
+                            World.add(world, constraint);
+                            tablebody.push(shape);
+                        }
+                    } else {
                         console.log("识别失败");
                     }
                     console.log("成没成功她都得清空");
                     xPoint = [];
                     yPoint = [];
-                    ctx.clearRect(0, 0, 1400, 800);
+                    ctx.clearRect(0, 0, width, height);
                 },
-                error:function(){
+                error: function () {
                     xPoint = [];
                     yPoint = [];
                 }
@@ -199,7 +203,7 @@ $(function () {
 
     $('#canvas').mousedown(function (e) {
         paint = true;
-        if( handler != null ) clearTimeout(handler);
+        if (handler != null) clearTimeout(handler);
 
         // xPoint = [];
         // yPoint = [];
@@ -208,36 +212,63 @@ $(function () {
     });
 
     $('#canvas').mousemove(function (e) {
-        if (paint == true ) {
+        if (paint == true) {
             ctx.lineTo(e.pageX - this.offsetLeft, e.pageY - this.offsetTop);
-
             xPoint.push(e.pageX - this.offsetLeft);
             yPoint.push(e.pageY - this.offsetTop);
 
-            ctx.strokeStyle = 'white';
+            ctx.strokeStyle = 'black';
             ctx.stroke();
         }
     });
 
     $('#canvas').mouseup(function (e) {
-        paint = false ;
+        paint = false;
 
-        if( paint == false ){
+        if (paint == false) {
             handler = setTimeout(function () {
-                if( paint == false ){
+                if (paint == false) {
                     clearTimeout(handler);
-
                     console.log("该执行识别了");
                     recogniseGeometry();
-
                 }
-            },2500);
-        }else {
-            if( handler != null ) clearTimeout(handler);
+            }, 500);   //TODO 时间
+        } else {
+            if (handler != null) clearTimeout(handler);
         }
 
     });
 
+
+    //TODO 获取木块坐标，计算图像
+    //TODO 考虑下图像显示的位置大小，以及如何显示在画布之上
+    //TODO 根据动画速度动态改变时间增长率
+
+    //kert2020 用于保存创建的所有body,在表格中展示body的speed
+    let tablebody = [];
+
+    //kert2020
+    //1初始化
+    //1.1初始化表格，获取表格对象，获取表格选项对象
+    obj = initTable();
+    let myChart = obj.myChart;
+    let option = obj.option;
+    //1.2初始化计时器对象
+    let currentTimeOut;
+
+    //2.控制图像绘制的开关
+    $(document).ready(function () {
+        $("#start").click(function () {
+            // if ($("#start").text() == "开始") {
+            //     $("#start").text("暂停");
+            //     console.log("tablebody: ",tablebody);
+            //     currentTimeOut = startDrawTable(tablebody, 0, myChart, option);
+            // } else {
+            //     $("#start").text("开始");
+            //     clearInterval(currentTimeOut);
+            // }
+        });
+    });
 
 });
 

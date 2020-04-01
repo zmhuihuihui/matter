@@ -3,7 +3,7 @@ package com.demo.matter.Util;
 
 public enum DrawStatus {
 
-    SHAPE("shape"), CHARACTER("character");
+    SHAPE("shape"), CHAR("char");
 
     private String status;
 
