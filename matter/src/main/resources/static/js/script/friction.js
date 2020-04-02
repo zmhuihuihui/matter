@@ -164,7 +164,6 @@ $(function () {
                          */
 
 
-
                             //TODO 识别为三角形默认固定，计算坐标贴合地面
                             //TODO 识别为长方形，计算坐标贴合斜面
                         var path = String(data.path);

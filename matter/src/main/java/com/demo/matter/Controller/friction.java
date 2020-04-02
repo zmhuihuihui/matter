@@ -30,6 +30,11 @@ public class friction {
         return "friction";
     }
 
+    @RequestMapping("/testFriction")
+    public String forwardt() {
+        return "testFriction";
+    }
+
     @CrossOrigin(origins = "*")
     @ResponseBody
     @RequestMapping(value = "/friction/handle", method = RequestMethod.POST)
