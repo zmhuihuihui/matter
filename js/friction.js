@@ -11,8 +11,6 @@ $(function () {
         Vertices = Matter.Vertices,
         Constraint = Matter.Constraint,
         Mouse = Matter.Mouse,
-        Composite = Matter.Composite,
-        Composites = Matter.Composites,
         MouseConstraint = Matter.MouseConstraint,
         Events = Matter.Events;
 
@@ -87,10 +85,6 @@ $(function () {
 
     /*******************   图表    *******************/
 
-    //TODO 获取木块坐标，计算图像
-    //TODO 考虑下图像显示的位置大小，以及如何显示在画布之上
-    //TODO 根据动画速度动态改变时间增长率
-
     let tablebody = [];
     obj = initTable();
     let myChart = obj.myChart;
@@ -118,17 +112,17 @@ $(function () {
         else {
             $(this).attr("checked", true).css('background', "url(../pic/start.png) no-repeat");
             document.getElementById("canvas").style.display = 'block';
-            //TODO 暂停引擎以图表
             clearInterval(currentTimeOut);
             runner.enabled = false;
 
         }
     });
+    //重置
     $('#restart').click(function () {
         clearInterval(currentTimeOut);
         //移除旧rectangle
         World.remove(world, rectangleShape);
-        //重置新rectangle
+        //添加新rectangle
         let pointVector = Vertices.fromPath(rectangle.path);
         rectangleShape = Bodies.fromVertices(rectangle.centreX, rectangle.centreY, pointVector, {
             friction: 0
@@ -207,7 +201,7 @@ $(function () {
                 triangle = data;
             } 
         }else{
-            
+            // TODO
         }
 
     }
