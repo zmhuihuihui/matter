@@ -153,6 +153,7 @@ $(function () {
     var rectangleShape = null;   //rectangle body
     var triangle = null;
     var triangleShape = null;
+    var result = null;
 
     function collectStrokes(e) {
         xPoint.push(e.pageX - this.offsetLeft);
@@ -167,9 +168,10 @@ $(function () {
             points[i] = new Point(parseInt(xPoint[i]), parseInt(yPoint[i]));
             //s += "new Point("+ parseInt(xPoint[i]) +","+parseInt(yPoint[i])+"),";
         }
+        
 
         //识别
-        let result = DollarOneRecognizer.Recognize(points, true);
+        result = DollarOneRecognizer.Recognize(points, true);
         
         if (result.Name.indexOf("Status") != -1) {
             status = result.Name;
@@ -218,7 +220,6 @@ $(function () {
             ctx.lineTo(e.pageX - this.offsetLeft, e.pageY - this.offsetTop);
             xPoint.push(e.pageX - this.offsetLeft);
             yPoint.push(e.pageY - this.offsetTop);
-
             ctx.strokeStyle = 'black';
             ctx.stroke();
         }
@@ -232,7 +233,8 @@ $(function () {
                     recogniseGeometry();
                     xPoint = [];
                     yPoint = [];
-                    ctx.clearRect(0, 0, width, height);
+                    if(status == "drawStatus" || result.Name == "charStatus" ||result.Name == "gou") 
+                        ctx.clearRect(0, 0, width, height);
                 }
             }, 500);   //TODO 时间
         } else {
