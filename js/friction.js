@@ -120,6 +120,7 @@ $(function () {
     //重置
     $('#restart').click(function () {
         clearInterval(currentTimeOut);
+        tablebody=[];
         //移除旧rectangle
         World.remove(world, rectangleShape);
         //添加新rectangle
