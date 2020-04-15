@@ -90,7 +90,11 @@ $(function () {
     let myChart = obj.myChart;
     let option = obj.option;
     let currentTimeOut;
-
+    let historyBody=[];//用于保存历史数据
+    let historyCount=0;//用于保存历史物块的数量
+    let startTime={
+        time:0,
+    }
 
     /*******************   开始/暂停/重置   *******************/
     $("#start").click(function () {
@@ -105,7 +109,7 @@ $(function () {
             for (var con of constraintList) {
                 World.remove(world, con);
             }
-            currentTimeOut = startDrawTable(tablebody, 0, myChart, option);
+            currentTimeOut = startDrawTable(tablebody, startTime, myChart, option,historyBody,historyCount);
             runner.enabled = true;
         }
         //暂停
@@ -114,13 +118,10 @@ $(function () {
             document.getElementById("canvas").style.display = 'block';
             clearInterval(currentTimeOut);
             runner.enabled = false;
-
         }
     });
     //重置
     $('#restart').click(function () {
-        clearInterval(currentTimeOut);
-        tablebody=[];
         //移除旧rectangle
         World.remove(world, rectangleShape);
         //添加新rectangle
@@ -135,8 +136,14 @@ $(function () {
         });
         constraintList.add(constraint);
         World.add(world, [rectangleShape, constraint]);
+
+        //对图表的操作
+        startTime.time=0;
         tablebody.push(rectangleShape);
+        historyCount=historyBody.length;
+
         rectangle = data;
+
     });
 
 
