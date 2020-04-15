@@ -1,6 +1,6 @@
-function  initTable(){
+function initTable() {
     console.log("initTable is invoked");
-    let myChart=echarts.init(document.getElementById("table"));
+    let myChart = echarts.init(document.getElementById("table"));
     let option = {
         tooltip: {
             trigger: 'axis',
@@ -11,10 +11,10 @@ function  initTable(){
         title: {
             left: 'center',
             text: '速度-时间图像',
-            padding:[5,0,400,0],
+            padding: [5, 0, 400, 0],
         },
-        grid:{
-            top:85,
+        grid: {
+            top: 85,
         },
         toolbox: {
             feature: {
@@ -31,21 +31,23 @@ function  initTable(){
             data: [],
             nameLocation: 'end',
             name: '时间-秒',
+            max: 600,
         },
         yAxis: {
             type: 'value',
             boundaryGap: ['0%', '10%'],
-            name: '速度-米/秒'
+            name: '速度-米/秒',
+            max: 5
         },
-        legend:{
-            data:[],
-            left:30,
+        legend: {
+            data: [],
+            left: 30,
             top: 30,
 
         },
         dataZoom: [{
             type: 'inside',
-            start: 50,
+            start: 0,
             end: 100
         }, {
             start: 0,
@@ -70,63 +72,63 @@ function  initTable(){
             }
         ]
     };
-    window.onresize=function () {
+    window.onresize = function () {
         myChart.resize();
     }
-    return {myChart,option};
+    return { myChart, option };
 }
 
-function startDrawTable(drawBodies,startTime,myChart,option,historyBody,historyCount){
+function startDrawTable(drawBodies, startTime, myChart, option, historyBody, historyCount) {
     //处理历史数据，
     //let historyCount=historyBody.length;
     //将新物块的属性保存在历史记录中
-    for (let i=historyCount;i<drawBodies.length;i++){
-        historyBody[i]={
-            color:'',
-            speed:[]
+    for (let i = historyCount; i < drawBodies.length; i++) {
+        historyBody[i] = {
+            color: '',
+            speed: []
         };
-        historyBody[i].color=drawBodies[i].render.fillStyle;
+        historyBody[i].color = drawBodies[i].render.fillStyle;
     }
 
     console.log("startDrawTalbe is invoked");
 
     //如果起始时间为0说明是新的开始，那么把表格里之前存储的数据全部清空掉
-    if (startTime.time==0){
-        option.xAxis.data=[];
-        option.series=[];
-        option.legend.data=[];
+    if (startTime.time == 0) {
+        option.xAxis.data = [];
+        option.series = [];
+        option.legend.data = [];
     }
 
     let timeOut1 = setInterval(function () {
-        option.xAxis.data.push(((startTime.time++)*0.01).toFixed(2));
+        option.xAxis.data.push(((startTime.time++) * 0.01).toFixed(2));
         // console.log(drawBodies);
-        count=drawBodies.length;
+        count = drawBodies.length;
         // console.log(count);
-        for (let i=1;i<=count;i++){
-            if (option.series[i-1]==null){
-                option.series[i-1]={
-                    name: '物块'+i,
+        for (let i = 1; i <= count; i++) {
+            if (option.series[i - 1] == null) {
+                option.series[i - 1] = {
+                    name: '物块' + i,
                     type: 'line',
                     symbol: 'none',
                     sampling: 'average',
                     data: [],
-                    cursor:'pointer',
+                    cursor: 'pointer',
                     //color:drawBodies[i-1].render.fillStyle,
-                    color: historyBody[i-1].color
+                    color: historyBody[i - 1].color
                 }
-                option.legend.data.push('物块'+i);
+                option.legend.data.push('物块' + i);
             }
             //如果是之前的物块，速度从historyBody中取出来
-            if (i<=historyCount){
-                if (historyBody[i-1].speed[startTime.time-1]!=null){
-                    option.series[i-1].data.push(historyBody[i-1].speed[startTime.time-1]);
-                }else{
+            if (i <= historyCount) {
+                if (historyBody[i - 1].speed[startTime.time - 1] != null) {
+                    option.series[i - 1].data.push(historyBody[i - 1].speed[startTime.time - 1]);
+                } else {
                     //option.series[i-1].data.push(0);
                 }
-            }else {
+            } else {
                 //新物块从引擎获取速度
-                option.series[i-1].data.push(drawBodies[i-1].speed);
-                historyBody[i-1].speed=option.series[i-1].data;//将新物块的速度保存在历史记录中
+                option.series[i - 1].data.push(drawBodies[i - 1].speed);
+                historyBody[i - 1].speed = option.series[i - 1].data;//将新物块的速度保存在历史记录中
             }
             //console.log("body color:"+drawBodies[i-1].render.fillStyle);
         }

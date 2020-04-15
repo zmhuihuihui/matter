@@ -25,7 +25,7 @@ function Restructure(points, name) {
         let incline = false;
         //倾斜阈值
         if (Math.abs(startPoint.X - firstPoint.X) > 15) incline = true;
-        return restructureRectangle(startPoint,firstPoint , width, height, incline);
+        return restructureRectangle(startPoint, firstPoint, width, height, incline);
     }
     else if (name == "triangle") return restructureTriangle(firstPoint, width, height);
 }
@@ -60,7 +60,7 @@ function restructureRectangle(startPoint, firstPoint, width, height, incline) {
             path += vertices[3].X + " " + vertices[3].Y;
             return new ShapeData((vertices[0].X + vertices[2].X) / 2, (vertices[1].Y + vertices[3].Y) / 2, path);
         }
-        return new ShapeData(0,0,path);
+        return new ShapeData(0, 0, path);
     } else {
         let path = firstPoint.X + " " + firstPoint.Y + " ";
         path += firstPoint.X + " " + (firstPoint.Y + height) + " ";

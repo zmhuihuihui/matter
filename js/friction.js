@@ -13,6 +13,7 @@ $(function () {
         Mouse = Matter.Mouse,
         MouseConstraint = Matter.MouseConstraint,
         Events = Matter.Events;
+        Body = Matter.Body;
 
 
     var engine = Engine.create(),
@@ -83,22 +84,22 @@ $(function () {
     //默认状态
     var status = "drawStatus";
 
-    /*******************   图表    *******************/
 
+    /*******************   图表    *******************/
     let tablebody = [];
     obj = initTable();
     let myChart = obj.myChart;
     let option = obj.option;
     let currentTimeOut;
-    let historyBody=[];//用于保存历史数据
-    let historyCount=0;//用于保存历史物块的数量
-    let startTime={
-        time:0,
+    let historyBody = [];//用于保存历史数据
+    let historyCount = 0;//用于保存历史物块的数量
+    let startTime = {
+        time: 0,
     }
+
 
     /*******************   开始/暂停/重置   *******************/
     $("#start").click(function () {
-
         //开始
         if ($(this).prop("checked")) {
             $(this).css('background', "url(../pic/pause.png) no-repeat").attr("checked", false);
@@ -109,7 +110,7 @@ $(function () {
             for (var con of constraintList) {
                 World.remove(world, con);
             }
-            currentTimeOut = startDrawTable(tablebody, startTime, myChart, option,historyBody,historyCount);
+            currentTimeOut = startDrawTable(tablebody, startTime, myChart, option, historyBody, historyCount);
             runner.enabled = true;
         }
         //暂停
@@ -127,7 +128,9 @@ $(function () {
         //添加新rectangle
         let pointVector = Vertices.fromPath(rectangle.path);
         rectangleShape = Bodies.fromVertices(rectangle.centreX, rectangle.centreY, pointVector, {
-            friction: 0
+            mass: 500,
+            friction: 0.8,
+            frictionAir: 0
         });
         let constraint = Constraint.create({
             pointA: { x: rectangle.centreX, y: rectangle.centreY },
@@ -136,16 +139,14 @@ $(function () {
         });
         constraintList.add(constraint);
         World.add(world, [rectangleShape, constraint]);
-
-        //对图表的操作
-        startTime.time=0;
-        tablebody.push(rectangleShape);
-        historyCount=historyBody.length;
-
         rectangle = data;
 
-    });
+        //对图表的操作
+        startTime.time = 0;
+        tablebody.push(rectangleShape);
+        historyCount = historyBody.length;
 
+    });
 
 
     /**********************   识别    **********************/
@@ -161,6 +162,8 @@ $(function () {
     var rectangleShape = null;   //rectangle body
     var triangle = null;
     var triangleShape = null;
+    var result = null;
+    var writeQueue = [];
 
     function collectStrokes(e) {
         xPoint.push(e.pageX - this.offsetLeft);
@@ -177,44 +180,68 @@ $(function () {
         }
 
         //识别
-        let result = DollarOneRecognizer.Recognize(points, true);
-        
+        result = DollarOneRecognizer.Recognize(points, true);
+        alert(result.Name);
         if (result.Name.indexOf("Status") != -1) {
+            document.getElementById("status").style.setProperty("background","url(../pic/"+result.Name+".png) no-repeat ")
+            $(this).css('background', "url(../pic/"+result.Name+".png) no-repeat");
             status = result.Name;
-        }else if(result.Name.indexOf("angle") != -1){
+            writeQueue = [];
+        } else if (result.Name.indexOf("angle") != -1) {
             let data = Restructure(points, result.Name);
             let pointVector = Vertices.fromPath(data.path);
             //矩形
             if (result.Name == "rectangle" && data.path != "") {
                 rectangleShape = Bodies.fromVertices(data.centreX, data.centreY, pointVector, {
-                    friction: 0
+                    mass: 500,
+                    friction: 0.8,
+                    frictionAir: 0
                 });
+                World.add(world, rectangleShape);
                 let constraint = Constraint.create({
                     pointA: { x: data.centreX, y: data.centreY },
                     bodyB: rectangleShape,
                     length: 0
                 });
                 constraintList.add(constraint);
-                World.add(world, [rectangleShape, constraint]);
+                World.add(world, constraint);
                 tablebody.push(rectangleShape);
                 rectangle = data;
             }
             //三角形
-            else if(result.Name == "triangle") {
+            else if (result.Name == "triangle") {
                 triangleShape = Bodies.fromVertices(data.centreX, data.centreY, pointVector, {
-                    friction: 0,
+                    friction: 0.3,
                     isStatic: true
                 });
                 World.add(world, triangleShape);
                 triangle = data;
-            } 
-        }else{
-            // TODO
+            }
+        } else {
+            if (result.Name == "xita" || result.Name == "miu") {
+                writeQueue = [];
+                writeQueue.push(result.Name);
+            } else if (result.Name == "gou") {
+                console.log(writeQueue);
+                //修改摩操因素
+                if (writeQueue[0] == "miu") {
+                    if (rectangleShape != null && writeQueue.length == 3) 
+                    rectangleShape.friction = parseInt(writeQueue[2]);
+                }
+                //修改角度
+                else {
+                    //TODO
+                }
+                writeQueue = [];
+            } else {
+                writeQueue.push(result.Name);
+            }
         }
-
     }
 
+
     /*******************   鼠标监听    *******************/
+    let handler = null;
     $('#canvas').mousedown(function (e) {
         paint = true;
         if (handler != null) clearTimeout(handler);
@@ -226,7 +253,6 @@ $(function () {
             ctx.lineTo(e.pageX - this.offsetLeft, e.pageY - this.offsetTop);
             xPoint.push(e.pageX - this.offsetLeft);
             yPoint.push(e.pageY - this.offsetTop);
-
             ctx.strokeStyle = 'black';
             ctx.stroke();
         }
@@ -240,7 +266,8 @@ $(function () {
                     recogniseGeometry();
                     xPoint = [];
                     yPoint = [];
-                    ctx.clearRect(0, 0, width, height);
+                    if (status == "drawStatus" || result.Name == "charStatus" || result.Name == "gou")
+                        ctx.clearRect(0, 0, width, height);
                 }
             }, 500);   //TODO 时间
         } else {
