@@ -31,13 +31,13 @@ function initTable() {
             data: [],
             nameLocation: 'end',
             name: '时间-秒',
-            max: 600,
+            max: 800,
         },
         yAxis: {
             type: 'value',
             boundaryGap: ['0%', '10%'],
             name: '速度-米/秒',
-            max: 5
+            max: 6
         },
         legend: {
             data: [],
