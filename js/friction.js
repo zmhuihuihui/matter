@@ -120,7 +120,7 @@ $(function () {
     //重置
     $('#restart').click(function () {
         clearInterval(currentTimeOut);
-        tablebody=[];
+        tablebody = [];
         //移除旧rectangle
         World.remove(world, rectangleShape);
         //添加新rectangle
@@ -155,6 +155,7 @@ $(function () {
     var triangle = null;
     var triangleShape = null;
     var result = null;
+    var writeQueue = [];
 
     function collectStrokes(e) {
         xPoint.push(e.pageX - this.offsetLeft);
@@ -169,14 +170,15 @@ $(function () {
             points[i] = new Point(parseInt(xPoint[i]), parseInt(yPoint[i]));
             //s += "new Point("+ parseInt(xPoint[i]) +","+parseInt(yPoint[i])+"),";
         }
-        
+
 
         //识别
         result = DollarOneRecognizer.Recognize(points, true);
-        
+
         if (result.Name.indexOf("Status") != -1) {
             status = result.Name;
-        }else if(result.Name.indexOf("angle") != -1){
+            writeQueue = [];
+        } else if (result.Name.indexOf("angle") != -1) {
             let data = Restructure(points, result.Name);
             let pointVector = Vertices.fromPath(data.path);
             //矩形
@@ -195,21 +197,38 @@ $(function () {
                 rectangle = data;
             }
             //三角形
-            else if(result.Name == "triangle") {
+            else if (result.Name == "triangle") {
                 triangleShape = Bodies.fromVertices(data.centreX, data.centreY, pointVector, {
                     friction: 0,
                     isStatic: true
                 });
                 World.add(world, triangleShape);
                 triangle = data;
-            } 
-        }else{
-            // TODO
+            }
+        } else {
+            if (result.Name == "xita" || result.Name == "miu") {
+                writeQueue = [];
+                writeQueue.push(result.Name);
+            } else if (result.Name == "gou") {
+                console.log(writeQueue);
+                //修改摩操因素
+                if (writeQueue[0] == "miu") {
+                    if (rectangleShape != null) rectangleShape.friction = parseInt(writeQueue[2]);
+                }
+                //修改角度
+                else {
+                    //TODO
+                }
+                writeQueue = [];
+            } else {
+                writeQueue.push(result.Name);
+            }
         }
 
     }
 
     /*******************   鼠标监听    *******************/
+    let handler = null;
     $('#canvas').mousedown(function (e) {
         paint = true;
         if (handler != null) clearTimeout(handler);
@@ -234,7 +253,7 @@ $(function () {
                     recogniseGeometry();
                     xPoint = [];
                     yPoint = [];
-                    if(status == "drawStatus" || result.Name == "charStatus" ||result.Name == "gou") 
+                    if (status == "drawStatus" || result.Name == "charStatus" || result.Name == "gou")
                         ctx.clearRect(0, 0, width, height);
                 }
             }, 500);   //TODO 时间

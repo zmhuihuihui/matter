@@ -1,6 +1,6 @@
-function  initTable(){
+function initTable() {
     console.log("initTable is invoked");
-    let myChart=echarts.init(document.getElementById("table"));
+    let myChart = echarts.init(document.getElementById("table"));
     let option = {
         tooltip: {
             trigger: 'axis',
@@ -11,10 +11,10 @@ function  initTable(){
         title: {
             left: 'center',
             text: '速度-时间图像',
-            padding:[5,0,400,0],
+            padding: [5, 0, 400, 0],
         },
-        grid:{
-            top:85,
+        grid: {
+            top: 85,
         },
         toolbox: {
             feature: {
@@ -27,25 +27,28 @@ function  initTable(){
         },
         xAxis: {
             type: 'category',
-            boundaryGap: false,
+            boundaryGap: true,
             data: [],
             nameLocation: 'end',
             name: '时间-秒',
+            max: 800,
+            splitNumber: 8
         },
         yAxis: {
             type: 'value',
             boundaryGap: ['0%', '10%'],
-            name: '速度-米/秒'
+            name: '速度-米/秒',
+            max: 6
         },
-        legend:{
-            data:[],
-            left:30,
+        legend: {
+            data: [],
+            left: 30,
             top: 30,
 
         },
         dataZoom: [{
             type: 'inside',
-            start: 50,
+            start: 0,
             end: 100
         }, {
             start: 0,
@@ -70,36 +73,36 @@ function  initTable(){
             }
         ]
     };
-    window.onresize=function () {
+    window.onresize = function () {
         myChart.resize();
     }
-    return {myChart,option};
+    return { myChart, option };
 }
 
-function startDrawTable(drawBodies,time,myChart,option){
+function startDrawTable(drawBodies, time, myChart, option) {
     console.log("startDrawTalbe is invoked");
-    option.xAxis.data=[];
-    option.series=[];
-    option.legend.data=[];
+    option.xAxis.data = [];
+    option.series = [];
+    option.legend.data = [];
     let timeOut1 = setInterval(function () {
-        option.xAxis.data.push(((time++)*0.01).toFixed(2));
+        option.xAxis.data.push(((time++) * 0.01).toFixed(2));
         // console.log(drawBodies);
-        count=drawBodies.length;
+        count = drawBodies.length;
         // console.log(count);
-        for (let i=1;i<=count;i++){
-            if (option.series[i-1]==null){
-                option.series[i-1]={
-                    name: '物块'+i,
+        for (let i = 1; i <= count; i++) {
+            if (option.series[i - 1] == null) {
+                option.series[i - 1] = {
+                    name: '物块' + i,
                     type: 'line',
                     symbol: 'none',
                     sampling: 'average',
                     data: [],
-                    cursor:'pointer',
-                    color:drawBodies[i-1].render.fillStyle,
+                    cursor: 'pointer',
+                    color: drawBodies[i - 1].render.fillStyle,
                 }
-                option.legend.data.push('物块'+i);
+                option.legend.data.push('物块' + i);
             }
-            option.series[i-1].data.push(drawBodies[i-1].speed);
+            option.series[i - 1].data.push(drawBodies[i - 1].speed);
             //console.log("body color:"+drawBodies[i-1].render.fillStyle);
         }
         myChart.setOption(option);
