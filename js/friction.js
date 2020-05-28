@@ -179,6 +179,7 @@ $(function () {
             points[i] = new Point(parseInt(xPoint[i]), parseInt(yPoint[i]));
             //s += "new Point("+ parseInt(xPoint[i]) +","+parseInt(yPoint[i])+"),";
         }
+        //console.log(s);
 
         //识别
         result = DollarOneRecognizer.Recognize(points, true);
@@ -206,7 +207,7 @@ $(function () {
                 constraintList.add(constraint);
                 World.add(world, [rectangleShape, constraint]);
                 tablebody.push(rectangleShape);
-                
+
             }
             //三角形
             else if (result.Name == "triangle") {
@@ -226,12 +227,37 @@ $(function () {
                 console.log(writeQueue);
                 //修改摩操因素
                 if (writeQueue[0] == "miu") {
-                    if (rectangleShape != null && writeQueue.length == 3)
-                        rectangleShape.friction = parseInt(writeQueue[2]);
+                    console.log(writeQueue);
+                    if (rectangleShape != null && writeQueue.length > 0)
+                        for (let i = 0; i < writeQueue.length; i++) {
+                            if (writeQueue[i] == ".") {
+                                rectangleShape.friction = parseInt(writeQueue[i + 1] / 10);
+                                break;
+                            }
+                        }
                 }
                 //修改角度
-                else {
-                    //TODO
+                else if (writeQueue[0] == "xita") {
+                    if (triangleShape != null && writeQueue.length > 0) {
+                        let newAngle = 0;
+                        let mul = 1;
+                        for (let i = writeQueue.length - 1; i >= 0; i--) {
+                            if (writeQueue[i] != "=") {
+                                newAngle += parseInt(writeQueue[i]) * mul;
+                                mul *= 10;
+                            } else break;
+                        }
+                        if (newAngle > 0 && newAngle < 90) {
+                            let newPath = modifyTriangleAngle(triangle.path, newAngle);
+                            World.remove(world, triangleShape);
+                            let pointVector = Vertices.fromPath(newPath);
+                            triangleShape = Bodies.fromVertices(triangle.centreX, triangle.centreY, pointVector, {
+                                friction: 0.3,
+                                isStatic: true
+                            });
+                            World.add(world, triangleShape);
+                        }
+                    }
                 }
                 writeQueue = [];
             } else {

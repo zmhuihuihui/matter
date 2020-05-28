@@ -53,7 +53,7 @@ function restructureRectangle(startPoint, firstPoint, width, height, incline) {
             vertices[2] = new Point((startPoint.X + bottomlen1), (startPoint.Y + height));
             let rightlen1 = parseInt((width - firstPoint.X + startPoint.X) * Math.tan(angle));
             vertices[3] = new Point((bottomlen1 + firstPoint.X), (startPoint.Y + height - leftlen1));
-            console.log(vertices[0]);
+            //console.log(vertices[0]);
             path = vertices[0].X + " " + vertices[0].Y + " ";
             path += vertices[1].X + " " + vertices[1].Y + " ";
             path += vertices[2].X + " " + vertices[2].Y + " ";
@@ -68,4 +68,18 @@ function restructureRectangle(startPoint, firstPoint, width, height, incline) {
         path += (firstPoint.X + width) + " " + firstPoint.Y;
         return new ShapeData(firstPoint.X + parseInt(width / 2), firstPoint.Y + parseInt(height / 2), path);
     }
+}
+
+function modifyTriangleAngle(path, newAngle){
+    angle = (newAngle/180) * Math.PI;
+    let newPath = "";
+    let points = path.split(" ");
+    let x = parseInt(points[4]) - parseInt(points[2]);
+    let y = parseInt(x) * Math.tan(angle);
+    points[1] = parseInt(parseInt(points[3]) - y) + "";
+    for(let i = 0; i < points.length;i++){
+        newPath += points[i];
+        if(i != points.length - 1) newPath += " ";
+    }
+    return newPath;
 }
